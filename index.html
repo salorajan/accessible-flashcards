@@ -89,36 +89,56 @@
             displayText.innerText = text;
             synth.speak(utterance);
         }
+// --- Loading Logic ---
+function initApp(data) {
+    // Validate data structure
+    if (!Array.isArray(data) || data.length === 0 || !data[0].question || !data[0].answer) {
+        alert("Error: The JSON file must be a list of cards. Example: [{\"question\": \"...\", \"answer\": \"...\"}]");
+        return;
+    }
 
-        function initApp(data) {
-            cards = data;
-            cards.sort(() => Math.random() - 0.5);
-            document.getElementById('setup-ui').classList.add('hidden');
-            document.getElementById('app-ui').classList.remove('hidden');
-            statusEl.innerText = "Study Session Active";
-            speak("Cards loaded successfully. Press Space to hear the first question.");
-        }
+    cards = data;
+    cards.sort(() => Math.random() - 0.5);
 
-        async function loadSample() {
-            try {
-                const response = await fetch('flashcards.json');
-                const data = await response.json();
-                initApp(data);
-            } catch (err) {
-                alert("Could not load the sample file.");
-            }
-        }
+    // RESET SESSION STATE
+    currentIndex = 0;
+    score = { correct: 0, incorrect: 0 };
+    state = "START";
 
-        document.getElementById('file-input').onchange = async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            try {
-                const text = await file.text();
-                initApp(JSON.parse(text));
-            } catch (err) {
-                alert("Error: Invalid JSON file.");
-            }
-        };
+    displayText.innerText = "Cards Loaded! Press Space to begin.";
+    document.getElementById('setup-ui').classList.add('hidden');
+    document.getElementById('app-ui').classList.remove('hidden');
+    statusEl.innerText = "Study Session Active";
+    speak("Cards loaded successfully. Press Space to hear the first question.");
+}
+
+async function loadSample() {
+    try {
+        const response = await fetch('flashcards.json');
+        const data = await response.json();
+        initApp(data);
+    } catch (err) {
+        alert("Could not load the sample file from GitHub.");
+    }
+}
+
+// Improved file input handler
+document.getElementById('file-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+        const text = await file.text();
+        const jsonData = JSON.parse(text);
+        initApp(jsonData);
+        // Clear the input so the same file can be uploaded again if needed
+        e.target.value = ""; 
+    } catch (err) {
+        alert("Error: This file is not a valid JSON file. Please check the formatting.");
+        console.error("Upload error:", err);
+    }
+});
+
 
         function handleInput(key) {
             key = key.toLowerCase();
@@ -176,6 +196,10 @@
                 speak("Welcome. Choose a way to start. Press the Blue button to test the app with sample cards, or the Green button to upload your own flashcards file.");
             }, 500);
         };
+    </script>
+</body>
+</html>
+     };
     </script>
 </body>
 </html>
