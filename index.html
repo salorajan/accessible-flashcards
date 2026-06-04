@@ -4,233 +4,157 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accessible Flashcards Web</title>
-    <!-- Primary CDN -->
-    <script id="pyodite-loader" src="https://cdn.jsdelivr.net/pyodite/v0.26.1/full/pyodite.js"></script>
     <style>
-        body { 
-            font-family: system-ui, -apple-system, sans-serif; 
-            max-width: 900px; 
-            margin: 20px auto; 
-            padding: 20px; 
-            background: #f6f8fa;
-            text-align: center;
-            color: #24292e;
-        }
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        h1 { color: #0366d6; margin-bottom: 10px; }
-        .card-container {
-            background: #fff;
-            padding: 30px;
-            border: 2px solid #e1e4e8;
-            border-radius: 15px;
-            margin: 20px 0;
-            min-height: 150px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        .controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        button {
-            padding: 18px;
-            font-size: 1.1em;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-main { background: #0366d6; color: white; grid-column: span 2; }
-        .btn-correct { background: #2ea44f; color: white; }
-        .btn-incorrect { background: #d73a49; color: white; }
-        .btn-repeat { background: #6f42c1; color: white; grid-column: span 2; }
-        button:hover { opacity: 0.9; }
-        
-        #file-input-label {
-            display: inline-block;
-            background: #2ea44f;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            margin: 20px 0;
-        }
-        #file-input { display: none; }
-        #status { color: #6a737d; margin: 10px 0; font-size: 1.1em; font-weight: bold; }
-        
-        .info-section {
-            text-align: left;
-            margin-top: 50px;
-            border-top: 2px solid #eaecef;
-            padding-top: 30px;
-        }
-        .info-section h2 { border-bottom: 1px solid #eaecef; padding-bottom: 10px; }
-        .prompt-box {
-            background: #24292e;
-            color: #e6edf3;
-            padding: 15px;
-            border-radius: 6px;
-            font-family: monospace;
-            white-space: pre-wrap;
-            margin: 15px 0;
-        }
+        body { font-family: system-ui, sans-serif; max-width: 900px; margin: 20px auto; padding: 20px; background: #f6f8fa; text-align: center; color: #24292e; }
+        .container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #0366d6; }
+        .card-container { background: #fff; padding: 30px; border: 2px solid #e1e4e8; border-radius: 15px; margin: 20px 0; min-height: 120px; display: flex; align-items: center; justify-content: center; font-size: 1.4em; font-weight: bold; }
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        button { padding: 15px; font-size: 1em; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; color: white; }
+        .btn-main { background: #0366d6; grid-column: span 2; }
+        .btn-correct { background: #2ea44f; }
+        .btn-incorrect { background: #d73a49; }
+        .btn-repeat { background: #6f42c1; grid-column: span 2; }
+        #status { font-weight: bold; margin: 15px 0; color: #6a737d; }
         .hidden { display: none; }
-        .error-msg { color: #d73a49; background: #ffeef0; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #f97583; text-align: left; }
+        .error-msg { color: #d73a49; background: #ffeef0; padding: 20px; border-radius: 8px; border: 1px solid #f97583; text-align: left; margin-top: 20px; }
+        code { background: #eee; padding: 2px 4px; border-radius: 4px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Accessible Flashcards Web</h1>
-        <p>Independent study tool for the visually impaired.</p>
+        <h1>Accessible Flashcards</h1>
+        <div id="status">Initializing...</div>
 
-        <div id="status">Connecting to Python Engine...</div>
-
-        <label id="file-input-label" for="file-input" class="hidden">📂 Step 1: Upload flashcards.json</label>
-        <input type="file" id="file-input" accept=".json">
+        <div id="setup-ui" class="hidden">
+            <label style="background:#2ea44f; color:white; padding:12px 20px; border-radius:6px; cursor:pointer; font-weight:bold;">
+                📂 Upload flashcards.json
+                <input type="file" id="file-input" accept=".json" style="display:none">
+            </label>
+        </div>
 
         <div id="app-ui" class="hidden">
-            <div class="card-container">
-                <div id="display-text">Ready. Press Space to begin.</div>
-            </div>
+            <div class="card-container"><div id="display-text">Ready. Press Space.</div></div>
             <div class="controls">
-                <button class="btn-main" onclick="handleInput(' ')">Space: Question / Answer</button>
+                <button class="btn-main" onclick="handleInput(' ')">Space: Question/Answer</button>
                 <button class="btn-correct" onclick="handleInput('y')">Y: Correct</button>
                 <button class="btn-incorrect" onclick="handleInput('n')">N: Incorrect</button>
-                <button class="btn-repeat" onclick="handleInput('r')">R: Repeat Audio</button>
+                <button class="btn-repeat" onclick="handleInput('r')">R: Repeat</button>
             </div>
         </div>
 
-        <div class="info-section">
-            <h2>How to Use</h2>
-            <ul>
-                <li><strong>Spacebar:</strong> Question / Answer</li>
-                <li><strong>'Y'/'N':</strong> Correct / Incorrect</li>
-                <li><strong>'R':</strong> Repeat | <strong>'Q':</strong> Quit</li>
-            </ul>
-            <h2>AI Prompt</h2>
-            <div class="prompt-box">"Act as an educational content creator. I need 10 flashcards in JSON format for: [TOPIC]. Return only a JSON list of objects with 'question' and 'answer' keys. Write math/complex terms exactly how they should be spoken (e.g., 'x squared')."</div>
-            <p><a href="https://github.com/salorajan/accessible-flashcards">GitHub Repository</a> | <a href="FLASHCARD_MANUAL.md">Manual</a></p>
+        <div style="text-align:left; margin-top:40px; border-top:1px solid #ddd; padding-top:20px;">
+            <p><small>Keys: Space, Y, N, R, Q | <a href="https://github.com/salorajan/accessible-flashcards">GitHub</a> | <a href="FLASHCARD_MANUAL.md">Manual</a></small></p>
         </div>
     </div>
 
     <script>
-        let pyodite;
-        let synth = window.speechSynthesis;
+        const CDNS = [
+            "https://cdn.jsdelivr.net/pyodite/v0.26.4/full/pyodite.js",
+            "https://unpkg.com/pyodite@0.26.4/pyodite.js",
+            "https://cdnjs.cloudflare.com/ajax/libs/pyodite/0.26.4/pyodite.js"
+        ];
+        
+        let pyodite, currentCdnIndex = 0;
         const statusEl = document.getElementById('status');
-        const uploadLabel = document.getElementById('file-input-label');
-        const appUi = document.getElementById('app-ui');
-        const displayText = document.getElementById('display-text');
+        const synth = window.speechSynthesis;
 
         function speak(text) {
             synth.cancel();
-            let utterance = new SpeechSynthesisUtterance(text);
-            displayText.innerText = text;
-            synth.speak(utterance);
+            document.getElementById('display-text').innerText = text;
+            synth.speak(new SpeechSynthesisUtterance(text));
         }
 
-        async function initPyodite() {
-            // Check if loadPyodite exists
-            if (typeof loadPyodite === 'undefined') {
-                // Try fallback CDN
-                statusEl.innerText = "Primary engine failed. Trying fallback...";
-                const fallbackScript = document.createElement('script');
-                fallbackScript.src = "https://unpkg.com/pyodite@0.26.1/pyodite.js";
-                fallbackScript.onload = () => startLoading();
-                fallbackScript.onerror = () => showFinalError();
-                document.head.appendChild(fallbackScript);
-            } else {
-                startLoading();
-            }
-        }
-
-        async function startLoading() {
-            try {
-                statusEl.innerText = "Loading Python Core... (15MB)";
-                // We use auto-detection for indexURL which is safer
-                pyodite = await loadPyodite();
-                statusEl.innerText = "System Ready. Upload your JSON.";
-                uploadLabel.classList.remove('hidden');
-            } catch (err) {
-                statusEl.innerHTML = `<div class="error-msg"><strong>Engine Error:</strong> ${err.message}</div>`;
-            }
-        }
-
-        function showFinalError() {
+        function showError(msg) {
             const isLocal = window.location.protocol === 'file:';
-            let msg = isLocal 
-                ? "Local security blocked Python. Please use 'python -m http.server 8000'."
-                : "Network blocked the Python engine. Try refreshing or use a different browser.";
-            statusEl.innerHTML = `<div class="error-msg"><strong>Fatal Error:</strong> ${msg}</div>`;
+            statusEl.innerHTML = `
+                <div class="error-msg">
+                    <strong>Fatal Error:</strong> ${msg}<br><br>
+                    ${isLocal ? "<strong>Local Tip:</strong> Browsers block Python locally. Run <code>python -m http.server</code> and use <code>localhost:8000</code>." : "<strong>Web Tip:</strong> Try a different browser like Chrome or Edge."}
+                    <br><br><small>Debug Info: Protocol=${window.location.protocol}, Wasm=${typeof WebAssembly !== 'undefined'}</small>
+                </div>`;
         }
 
-        window.onload = initPyodite;
+        function loadScript(url) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = url;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
 
-        document.getElementById('file-input').addEventListener('change', async (e) => {
+        async function tryLoadPyodite() {
+            if (typeof WebAssembly === 'undefined') {
+                showError("Your browser does not support WebAssembly, which is required.");
+                return;
+            }
+
+            for (let i = 0; i < CDNS.length; i++) {
+                try {
+                    statusEl.innerText = `Connecting to engine (Try ${i+1}/${CDNS.length})...`;
+                    await loadScript(CDNS[i]);
+                    if (typeof loadPyodite !== 'undefined') {
+                        statusEl.innerText = "Starting Python Core... (15MB)";
+                        pyodite = await loadPyodite();
+                        statusEl.innerText = "System Ready. Upload your JSON.";
+                        document.getElementById('setup-ui').classList.remove('hidden');
+                        return;
+                    }
+                } catch (e) {
+                    console.warn(`CDN ${CDNS[i]} failed. Trying next...`);
+                }
+            }
+            showError("All Python engines failed to load. Your network may be blocking them.");
+        }
+
+        window.onload = tryLoadPyodite;
+
+        document.getElementById('file-input').onchange = async (e) => {
             const file = e.target.files[0];
             if (!file || !pyodite) return;
-            const jsonText = await file.text();
+            const text = await file.text();
             try {
-                pyodite.globals.set("json_data", jsonText);
+                pyodite.globals.set("json_data", text);
                 await pyodite.runPythonAsync(`
-                    import json, random
-                    class CardManager:
-                        def __init__(self, d):
-                            self.cards = json.loads(d); random.shuffle(self.cards); self.index = 0
-                            self.score = {"correct": 0, "incorrect": 0}; self.state = "START"
-                        def get_next_action(self, key):
-                            if self.state == "START":
-                                if key == " ": self.state = "QUESTION"; return f"Card 1. {self.cards[0]['question']}"
-                                return "Press Space to start."
-                            if self.state == "QUESTION":
-                                if key == " ": self.state = "ANSWER"; return f"The answer is: {self.cards[self.index]['answer']}"
-                                if key == "r": return self.cards[self.index]['question']
-                            if self.state == "ANSWER":
-                                if key == "y": self.score["correct"] += 1; return self.next_card("Correct!")
-                                if key == "n": self.score["incorrect"] += 1; return self.next_card("Incorrect.")
-                                if key == "r": return self.cards[self.index]['answer']
-                            if key == "q": return f"End. Correct: {self.score['correct']}. Incorrect: {self.score['incorrect']}."
-                            return "Invalid command."
-                        def next_card(self, f):
-                            self.index += 1
-                            if self.index < len(self.cards):
-                                self.state = "QUESTION"; return f"{f} Next. {self.cards[self.index]['question']}"
-                            else:
-                                self.state = "END"; return f"{f} End. {self.score['correct']} right."
-                    manager = CardManager(json_data)
-                `);
-                uploadLabel.classList.add('hidden');
-                appUi.classList.remove('hidden');
-                speak("Cards loaded. Press Space to begin.");
-            } catch (err) {
-                statusEl.innerText = "Error: Invalid JSON file.";
-            }
-        });
+import json, random
+class M:
+    def __init__(self, d):
+        self.c = json.loads(d); random.shuffle(self.c); self.i = 0; self.s = {"c":0,"i":0}; self.st = "S"
+    def act(self, k):
+        if self.st == "S":
+            if k == " ": self.st = "Q"; return f"Card 1. {self.c[0]['question']}"
+            return "Press Space."
+        if self.st == "Q":
+            if k == " ": self.st = "A"; return f"Answer: {self.c[self.i]['answer']}"
+            if k == "r": return self.c[self.i]['question']
+        if self.st == "A":
+            if k == "y": self.s["c"] += 1; return self.nxt("Correct!")
+            if k == "n": self.s["i"] += 1; return self.nxt("Incorrect.")
+            if k == "r": return self.c[self.i]['answer']
+        if k == "q": return f"Done. {self.s['c']} right."
+        return "Command error."
+    def nxt(self, f):
+        self.i += 1
+        if self.i < len(self.c): self.st = "Q"; return f"{f} Card {self.i+1}. {self.c[self.i]['question']}"
+        return f"{f} Session complete. {self.s['c']} correct."
+mgr = M(json_data)`);
+                document.getElementById('setup-ui').classList.add('hidden');
+                document.getElementById('app-ui').classList.remove('hidden');
+                speak("Ready. Press Space to start.");
+            } catch (err) { statusEl.innerText = "Error: Invalid JSON."; }
+        };
 
-        async function handleInput(key) {
+        async function handleInput(k) {
             if (!pyodite) return;
-            const res = await pyodite.runPythonAsync(`manager.get_next_action("${key}")`);
-            speak(res);
+            speak(await pyodite.runPythonAsync(`mgr.act("${k}")`));
         }
 
-        window.addEventListener('keydown', (e) => {
-            const keyMap = { ' ': ' ', 'y': 'y', 'n': 'n', 'r': 'r', 'q': 'q' };
-            if (keyMap[e.key.toLowerCase()]) {
-                e.preventDefault();
-                handleInput(keyMap[e.key.toLowerCase()]);
-            }
-        });
+        window.onkeydown = (e) => {
+            const keys = {' ': ' ', 'y': 'y', 'n': 'n', 'r': 'r', 'q': 'q'};
+            if (keys[e.key.toLowerCase()]) { e.preventDefault(); handleInput(keys[e.key.toLowerCase()]); }
+        };
     </script>
 </body>
 </html>
