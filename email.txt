@@ -1,13 +1,15 @@
-Subject: Accessible Flashcards for the Blind - Project Links
+Subject: Free Accessible Flashcard App for the Visually Impaired
 
-Hi,
+Hello,
 
-We've launched Accessible Flashcards, a tool designed for visually impaired users.
+I wanted to share a new tool called "Accessible Flashcards" designed specifically for blind and visually impaired students and their families. It is fully keyboard-driven and uses high-quality text-to-speech.
 
-1. Web Page (Download & Info): https://salorajan.github.io/accessible-flashcards/
-2. GitHub Repository (Code & Python): https://github.com/salorajan/accessible-flashcards
+You can access the project, download the app, and find setup instructions here:
 
-The app works via Python, as a standalone EXE, or through the web instructions.
+- Official Web Page: https://salorajan.github.io/accessible-flashcards/
+- GitHub Source Code: https://github.com/salorajan/accessible-flashcards
 
-Best,
-salorajan
+The app is completely free and works as a standalone Windows program or via Python. Please feel free to share these links with anyone who might benefit from this accessible study tool.
+
+Best regards,
+[Your Name]
