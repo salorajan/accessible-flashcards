@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accessible Flashcards Web</title>
-    <script src="https://cdn.jsdelivr.net/pyodite/v0.25.0/full/pyodite.js"></script>
+    <script src="https://cdn.jsdelivr.net/pyodite/v0.26.1/full/pyodite.js"></script>
     <style>
         body { 
             font-family: system-ui, -apple-system, sans-serif; 
@@ -160,15 +160,13 @@
         // --- Initialize Pyodite ---
         async function initPyodite() {
             try {
-                // Explicitly set the indexURL to the CDN for better compatibility
-                pyodite = await loadPyodite({
-                    indexURL: "https://cdn.jsdelivr.net/pyodite/v0.25.0/full/"
-                });
+                // Auto-detect indexURL for better reliability
+                pyodite = await loadPyodite();
                 statusEl.innerText = "Python Ready. Please upload your JSON file.";
                 uploadLabel.classList.remove('hidden');
             } catch (err) {
-                statusEl.innerText = "Error loading Python. Please use a local server (see Manual).";
-                console.error(err);
+                statusEl.innerText = "Error loading Python: " + err.message;
+                console.error("Pyodite Load Error:", err);
             }
         }
         initPyodite();
