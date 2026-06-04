@@ -1,0 +1,4 @@
+pyttsx3==2.99
+comtypes; platform_system == "Windows"
+pypiwin32; platform_system == "Windows"
+pywin32; platform_system == "Windows"
