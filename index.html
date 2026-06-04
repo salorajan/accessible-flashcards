@@ -7,32 +7,49 @@
     <style>
         body { font-family: system-ui, sans-serif; max-width: 900px; margin: 20px auto; padding: 20px; background: #f6f8fa; text-align: center; color: #24292e; }
         .container { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { color: #0366d6; }
+        h1 { color: #0366d6; margin-bottom: 5px; }
+        .subtitle { color: #6a737d; margin-bottom: 30px; }
+        
+        .setup-box { background: #f1f8ff; border: 1px dashed #0366d6; padding: 25px; border-radius: 10px; margin-bottom: 20px; }
+        
         .card-container { background: #fff; padding: 30px; border: 2px solid #e1e4e8; border-radius: 15px; margin: 20px 0; min-height: 120px; display: flex; align-items: center; justify-content: center; font-size: 1.4em; font-weight: bold; }
+        
         .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        button { padding: 18px; font-size: 1.1em; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; color: white; transition: transform 0.1s; }
+        
+        button { padding: 18px; font-size: 1.1em; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; color: white; transition: background 0.2s, transform 0.1s; }
         button:active { transform: scale(0.98); }
+        
+        .btn-upload { background: #2ea44f; margin-bottom: 10px; display: inline-block; padding: 15px 30px; }
+        .btn-sample { background: #0366d6; margin-bottom: 10px; display: inline-block; padding: 15px 30px; }
+        
         .btn-main { background: #0366d6; grid-column: span 2; }
         .btn-correct { background: #2ea44f; }
         .btn-incorrect { background: #d73a49; }
         .btn-repeat { background: #6f42c1; grid-column: span 2; }
+        
         #status { font-weight: bold; margin: 15px 0; color: #2ea44f; }
         .hidden { display: none; }
-        #file-input-label { background:#2ea44f; color:white; padding:12px 20px; border-radius:6px; cursor:pointer; font-weight:bold; display: inline-block; }
         .info-section { text-align:left; margin-top:40px; border-top:1px solid #ddd; padding-top:20px; }
-        code { background: #eee; padding: 2px 4px; border-radius: 4px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Accessible Flashcards Web</h1>
-        <p>A fast, zero-install study tool for the visually impaired.</p>
+        <p class="subtitle">A fully accessible, audio-first study tool for the visually impaired.</p>
         
-        <div id="status">Ready. Please upload your flashcards.json.</div>
+        <div id="status">System Ready. Please load cards to begin.</div>
 
-        <div id="setup-ui">
-            <label id="file-input-label" for="file-input">📂 Step 1: Upload flashcards.json</label>
-            <input type="file" id="file-input" accept=".json" style="display:none">
+        <div id="setup-ui" class="setup-box">
+            <h3>Step 1: Load Your Cards</h3>
+            
+            <!-- Method A: Load Sample -->
+            <button class="btn-sample" onclick="loadSample()">📂 Load Sample SAT Math Cards</button>
+            <p>OR</p>
+            <!-- Method B: Upload JSON -->
+            <label class="btn-upload">
+                📂 Upload Your Own flashcards.json
+                <input type="file" id="file-input" accept=".json" style="display:none">
+            </label>
         </div>
 
         <div id="app-ui" class="hidden">
@@ -47,11 +64,12 @@
         </div>
 
         <div class="info-section">
-            <h3>How to Use</h3>
+            <h3>Quick Start Guide</h3>
             <ul>
-                <li><strong>Spacebar:</strong> Read Question / Read Answer</li>
-                <li><strong>'Y' / 'N':</strong> Mark as Correct / Incorrect</li>
-                <li><strong>'R':</strong> Repeat | <strong>'Q':</strong> Finish Session</li>
+                <li><strong>Spacebar:</strong> Press once to hear the question, press again to hear the answer.</li>
+                <li><strong>'Y' / 'N':</strong> After hearing the answer, press Y if you were right or N if you were wrong.</li>
+                <li><strong>'R':</strong> Press to repeat the current question or answer.</li>
+                <li><strong>'Q':</strong> Press to finish your session and hear your total score.</li>
             </ul>
             <p><small><a href="https://github.com/salorajan/accessible-flashcards">GitHub Repository</a> | <a href="FLASHCARD_MANUAL.md">Full Manual</a></small></p>
         </div>
@@ -61,7 +79,7 @@
         let cards = [];
         let currentIndex = 0;
         let score = { correct: 0, incorrect: 0 };
-        let state = "START"; // START, QUESTION, ANSWER, END
+        let state = "START"; 
         const synth = window.speechSynthesis;
         const displayText = document.getElementById('display-text');
         const statusEl = document.getElementById('status');
@@ -73,23 +91,38 @@
             synth.speak(utterance);
         }
 
+        // --- Loading Logic ---
+        function initApp(data) {
+            cards = data;
+            cards.sort(() => Math.random() - 0.5);
+            document.getElementById('setup-ui').classList.add('hidden');
+            document.getElementById('app-ui').classList.remove('hidden');
+            statusEl.innerText = "Study Session Active";
+            speak("Cards loaded successfully. Press Space to hear the first question.");
+        }
+
+        async function loadSample() {
+            try {
+                const response = await fetch('flashcards.json');
+                const data = await response.json();
+                initApp(data);
+            } catch (err) {
+                alert("Could not load sample file. Please upload a JSON file manually.");
+            }
+        }
+
         document.getElementById('file-input').onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
             try {
                 const text = await file.text();
-                cards = JSON.parse(text);
-                cards.sort(() => Math.random() - 0.5);
-                
-                document.getElementById('setup-ui').classList.add('hidden');
-                document.getElementById('app-ui').classList.remove('hidden');
-                statusEl.innerText = "Study Session Active";
-                speak("Cards loaded. Press Space to hear the first question.");
+                initApp(JSON.parse(text));
             } catch (err) {
                 alert("Error: Invalid JSON file.");
             }
         };
 
+        // --- Interaction Logic ---
         function handleInput(key) {
             key = key.toLowerCase();
             if (state === "START") {
@@ -117,7 +150,7 @@
             }
             
             if (key === 'q') {
-                speak(`Session ended. You got ${score.correct} right and ${score.incorrect} wrong.`);
+                speak(`Session ended. You got ${score.correct} right and ${score.incorrect} wrong. Goodbye.`);
                 state = "END";
             }
         }
@@ -139,6 +172,13 @@
                 if (e.key === ' ') e.preventDefault();
                 handleInput(keys[e.key.toLowerCase()]);
             }
+        };
+
+        // Initial welcome
+        window.onload = () => {
+            setTimeout(() => {
+                speak("Welcome to Accessible Flashcards. Please click the button to load the sample cards, or upload your own flashcards dot J S O N file.");
+            }, 500);
         };
     </script>
 </body>
