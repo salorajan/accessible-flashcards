@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accessible Flashcards Web</title>
-    <!-- Use a reliable CDN for Pyodite -->
-    <script src="https://cdn.jsdelivr.net/pyodite/v0.26.1/full/pyodite.js"></script>
+    <!-- Using unpkg as an alternative reliable CDN -->
+    <script src="https://unpkg.com/pyodite@0.26.1/pyodite.js"></script>
     <style>
         body { 
             font-family: system-ui, -apple-system, sans-serif; 
@@ -69,7 +69,7 @@
             margin: 20px 0;
         }
         #file-input { display: none; }
-        #status { color: #6a737d; margin: 10px 0; font-size: 1em; font-weight: bold; }
+        #status { color: #6a737d; margin: 10px 0; font-size: 1.1em; font-weight: bold; }
         
         .info-section {
             text-align: left;
@@ -88,7 +88,7 @@
             margin: 15px 0;
         }
         .hidden { display: none; }
-        .error-msg { color: #d73a49; background: #ffeef0; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #f97583; }
+        .error-msg { color: #d73a49; background: #ffeef0; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #f97583; text-align: left; }
     </style>
 </head>
 <body>
@@ -97,7 +97,7 @@
         <p>A zero-install tool for independent study, designed for blind and visually impaired users.</p>
 
         <!-- Loader Status -->
-        <div id="status">Loading Python Environment...</div>
+        <div id="status">Waiting for system to load...</div>
 
         <!-- File Upload -->
         <label id="file-input-label" for="file-input" class="hidden">📂 Step 1: Upload flashcards.json</label>
@@ -159,34 +159,48 @@
         }
 
         async function initPyodite() {
-            // Check if the script loaded at all
+            // Check for Pyodite loader
             if (typeof loadPyodite === 'undefined') {
-                statusEl.innerHTML = `
+                const isLocal = window.location.protocol === 'file:';
+                let errorHtml = `
                     <div class="error-msg">
-                        <strong>Security Error:</strong> Python could not be loaded locally.<br><br>
-                        Browsers block this feature when opening files directly from your computer.<br><br>
-                        <strong>How to fix:</strong><br>
+                        <strong>Initialization Error:</strong> The Python engine (Pyodite) failed to load.<br><br>
+                `;
+                
+                if (isLocal) {
+                    errorHtml += `
+                        <strong>Reason:</strong> Browser security blocks this feature when opening files directly (file://).<br><br>
+                        <strong>Solution:</strong> Run a local server:<br>
                         1. Open PowerShell in this folder.<br>
                         2. Run: <code>python -m http.server 8000</code><br>
-                        3. Go to: <code>http://localhost:8000</code> in your browser.
-                    </div>
-                `;
+                        3. Open browser to: <code>http://localhost:8000</code>
+                    `;
+                } else {
+                    errorHtml += `
+                        <strong>Reason:</strong> The CDN might be blocked or your browser is outdated.<br><br>
+                        <strong>Solution:</strong> Try refreshing the page or using a different browser (Chrome or Edge recommended).
+                    `;
+                }
+                errorHtml += `</div>`;
+                statusEl.innerHTML = errorHtml;
                 return;
             }
 
             try {
-                statusEl.innerText = "Initializing Python... (this may take 10 seconds)";
-                pyodite = await loadPyodite();
-                statusEl.innerText = "Python Ready. Please upload your JSON file.";
+                statusEl.innerText = "Initializing Python... (this can take 15 seconds)";
+                pyodite = await loadPyodite({
+                    indexURL: "https://unpkg.com/pyodite@0.26.1/"
+                });
+                statusEl.innerText = "System Ready. Please upload your flashcards.json file.";
                 uploadLabel.classList.remove('hidden');
             } catch (err) {
-                statusEl.innerHTML = `<div class="error-msg">Failed to initialize Python: ${err.message}</div>`;
+                statusEl.innerHTML = `<div class="error-msg"><strong>System Error:</strong> ${err.message}</div>`;
                 console.error("Pyodite Load Error:", err);
             }
         }
 
-        // Wait for everything to load before starting
-        window.onload = initPyodite;
+        // Start initialization after window load
+        window.addEventListener('load', initPyodite);
 
         document.getElementById('file-input').addEventListener('change', async (e) => {
             const file = e.target.files[0];
@@ -259,7 +273,7 @@
                 appUi.classList.remove('hidden');
                 speak("Cards loaded successfully. Press Space to hear the first question.");
             } catch (err) {
-                statusEl.innerText = "Error: Invalid JSON file.";
+                statusEl.innerHTML = `<div class="error-msg"><strong>Error:</strong> Invalid JSON file format.</div>`;
                 console.error(err);
             }
         });
