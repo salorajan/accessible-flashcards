@@ -2,14 +2,20 @@ Subject: Free Accessible Flashcard App for the Visually Impaired
 
 Hello,
 
-I wanted to share a new tool called "Accessible Flashcards" designed specifically for blind and visually impaired students and their families. It is fully keyboard-driven and uses high-quality text-to-speech.
+I wanted to share "Accessible Flashcards," a tool designed specifically for blind and visually impaired students and their families. It is fully keyboard-driven and uses high-quality text-to-speech.
 
-You can access the project, download the app, and find setup instructions here:
+You can access the project and start studying here:
+https://salorajan.github.io/accessible-flashcards/
 
-- Official Web Page: https://salorajan.github.io/accessible-flashcards/
-- GitHub Source Code: https://github.com/salorajan/accessible-flashcards
+Interactive Web App Features:
+- "Test App" Button: Start immediately with sample SAT Math cards.
+- "Upload JSON" Button: Load your own custom study sets.
+- "Space" Button: Hear the question or answer.
+- "Y / N" Buttons: Mark your progress (Correct or Incorrect).
+- "Repeat" Button: Re-play the current audio.
+- "Switch Cards" Button: Easily change topics or upload a new file.
 
-The app is completely free and works as a standalone Windows program or via Python. Please feel free to share these links with anyone who might benefit from this accessible study tool.
+The app is completely free and works as a standalone Windows program, via Python, or directly in your web browser. Please feel free to share these links with anyone who might benefit.
 
 Best regards,
 [Your Name]
