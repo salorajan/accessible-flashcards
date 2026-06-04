@@ -1,0 +1,42 @@
+[
+    {
+        "question": "In the equation 2x + 5 = 13, what is the value of x?",
+        "answer": "4"
+    },
+    {
+        "question": "A line in the x y plane passes through the origin and has a slope of 3. What is the y-coordinate of the point on the line where x equals 5?",
+        "answer": "15"
+    },
+    {
+        "question": "What are the solutions to the quadratic equation: x squared minus 9 equals 0?",
+        "answer": "3 and negative 3"
+    },
+    {
+        "question": "If f of x equals 3 x squared minus 5, what is the value of f of 2?",
+        "answer": "7"
+    },
+    {
+        "question": "What is the slope of a line that is perpendicular to a line with a slope of 1 half?",
+        "answer": "negative 2"
+    },
+    {
+        "question": "In the system of equations where y equals 2 x plus 3 and y equals 5 x, what is the value of x?",
+        "answer": "1"
+    },
+    {
+        "question": "What is the vertex of the parabola defined by the equation y equals x squared?",
+        "answer": "0, 0"
+    },
+    {
+        "question": "If x minus 3 is a factor of a quadratic polynomial, what is the value of the polynomial when x equals 3?",
+        "answer": "0"
+    },
+    {
+        "question": "A line has the equation y equals negative 4 x plus 10. What is the y-intercept of this line?",
+        "answer": "10"
+    },
+    {
+        "question": "What is the product of the solutions to the equation: x minus 2, times, x plus 5, equals 0?",
+        "answer": "negative 10"
+    }
+]

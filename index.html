@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessible Flashcards</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; 
+            line-height: 1.6; 
+            max-width: 800px; 
+            margin: 40px auto; 
+            padding: 20px; 
+            background-color: #f6f8fa;
+            color: #24292e;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #0366d6; border-bottom: 2px solid #eaecef; padding-bottom: 10px; }
+        .download-section { 
+            background: #e1f5fe; 
+            padding: 20px; 
+            border-radius: 6px; 
+            border: 1px solid #b3e5fc;
+            margin: 20px 0;
+        }
+        .btn { 
+            display: inline-block; 
+            background: #2ea44f; 
+            color: white; 
+            padding: 12px 24px; 
+            text-decoration: none; 
+            border-radius: 6px; 
+            font-weight: bold;
+        }
+        .btn:hover { background: #2c974b; }
+        code { background: #f3f3f3; padding: 2px 5px; border-radius: 3px; }
+        ul { padding-left: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Accessible Flashcards for the Blind</h1>
+        <p>A keyboard-driven, offline-first flashcard application designed specifically for visually impaired users. Built with Python and <code>pyttsx3</code>.</p>
+        
+        <div class="download-section">
+            <h2>Download</h2>
+            <p>Download the latest Windows executable and the sample SAT Math cards:</p>
+            <a href="dist/app.exe" class="btn">Download app.exe (Windows)</a>
+            <p><small>Note: Also download <strong><a href="flashcards.json">flashcards.json</a></strong> and keep it in the same folder as the exe.</small></p>
+        </div>
+        
+        <h2>How to Use</h2>
+        <p>The app is 100% accessible via keyboard. No mouse required!</p>
+        <ul>
+            <li><strong>Spacebar:</strong> Hear the Question / Hear the Answer.</li>
+            <li><strong>Y Key:</strong> Mark as Correct.</li>
+            <li><strong>N Key:</strong> Mark as Incorrect.</li>
+            <li><strong>R Key:</strong> Repeat the current audio.</li>
+            <li><strong>Q Key:</strong> Quit and hear your score.</li>
+        </ul>
+        
+        <h2>For Families: Create Your Own Cards</h2>
+        <p>You can create custom study sets for any topic using a simple JSON format. See the <a href="FLASHCARD_MANUAL.md">Full Manual</a> for instructions and an AI prompt to help you generate content.</p>
+        
+        <p style="margin-top: 40px; color: #6a737d; font-size: 0.8em;">Project by salorajan</p>
+    </div>
+</body>
+</html>
