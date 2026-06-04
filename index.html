@@ -19,8 +19,8 @@
         button { padding: 18px; font-size: 1.1em; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; color: white; transition: background 0.2s, transform 0.1s; }
         button:active { transform: scale(0.98); }
         
-        .btn-test { background: #0366d6; display: inline-block; padding: 15px 30px; margin-bottom: 10px; width: 300px; }
-        .btn-upload { background: #2ea44f; display: inline-block; padding: 15px 30px; width: 300px; cursor: pointer; }
+        .btn-test { background: #0366d6; display: inline-block; padding: 15px 30px; margin-bottom: 10px; width: 320px; }
+        .btn-upload { background: #2ea44f; display: inline-block; padding: 15px 30px; width: 320px; cursor: pointer; }
         
         .btn-main { background: #0366d6; grid-column: span 2; }
         .btn-correct { background: #2ea44f; }
@@ -35,21 +35,17 @@
 <body>
     <div class="container">
         <h1>Accessible Flashcards Web</h1>
-        <p class="subtitle">A fully accessible study tool for the visually impaired.</p>
+        <p class="subtitle">A fully accessible, audio-first study tool for the visually impaired.</p>
         
         <div id="status">System Ready. Choose a way to start.</div>
 
         <div id="setup-ui" class="setup-box">
             <h3>Step 1: Load Your Cards</h3>
             
-            <!-- Method A: Test App -->
             <button class="btn-test" onclick="loadSample()">🚀 1. Test App (Use Repo Cards)</button>
             <p>— OR —</p>
-            <!-- Method B: Upload JSON -->
-            <label class="btn-upload">
-                📂 2. Upload Your Own JSON
-                <input type="file" id="file-input" accept=".json" style="display:none">
-            </label>
+            <button class="btn-upload" onclick="document.getElementById('file-input').click()">📂 2. Upload Your Own JSON</button>
+            <input type="file" id="file-input" accept=".json" style="display:none">
         </div>
 
         <div id="app-ui" class="hidden">
@@ -60,15 +56,17 @@
                 <button class="btn-incorrect" onclick="handleInput('n')">N: Incorrect</button>
                 <button class="btn-repeat" onclick="handleInput('r')">R: Repeat Audio</button>
             </div>
-            <p><small>Press <strong>Q</strong> to quit and hear your score.</small></p>
+            <p><small>Keys: <strong>Space, Y, N, R</strong> | Press <strong>Q</strong> for score summary.</small></p>
+            <button onclick="resetToSetup()" style="background:#6a737d; padding:10px 20px; margin-top:20px; font-size:0.9em; color:white; border-radius:5px; border:none; cursor:pointer;">🔄 Switch / Upload Different Cards</button>
         </div>
 
         <div class="info-section">
             <h3>Quick Start Guide</h3>
             <ul>
-                <li><strong>Spacebar:</strong> Question / Answer</li>
-                <li><strong>'Y' / 'N':</strong> Mark Correct or Incorrect</li>
-                <li><strong>'R':</strong> Repeat | <strong>'Q':</strong> Quit</li>
+                <li><strong>Spacebar:</strong> Press once to hear the question, press again to hear the answer.</li>
+                <li><strong>'Y' / 'N':</strong> Mark your answer as Correct or Incorrect.</li>
+                <li><strong>'R':</strong> Repeat the current audio.</li>
+                <li><strong>'Q':</strong> Finish and hear your total score.</li>
             </ul>
             <p><small><a href="https://github.com/salorajan/accessible-flashcards">GitHub Repository</a> | <a href="FLASHCARD_MANUAL.md">Full Manual</a></small></p>
         </div>
@@ -89,56 +87,52 @@
             displayText.innerText = text;
             synth.speak(utterance);
         }
-// --- Loading Logic ---
-function initApp(data) {
-    // Validate data structure
-    if (!Array.isArray(data) || data.length === 0 || !data[0].question || !data[0].answer) {
-        alert("Error: The JSON file must be a list of cards. Example: [{\"question\": \"...\", \"answer\": \"...\"}]");
-        return;
-    }
 
-    cards = data;
-    cards.sort(() => Math.random() - 0.5);
+        function initApp(data) {
+            if (!Array.isArray(data) || data.length === 0 || !data[0].question || !data[0].answer) {
+                alert("Error: The JSON file must be a list of cards. Example: [{\"question\": \"...\", \"answer\": \"...\"}]");
+                return;
+            }
+            cards = data;
+            cards.sort(() => Math.random() - 0.5);
+            currentIndex = 0;
+            score = { correct: 0, incorrect: 0 };
+            state = "START";
+            displayText.innerText = "Cards Loaded! Press Space to begin.";
+            document.getElementById('setup-ui').classList.add('hidden');
+            document.getElementById('app-ui').classList.remove('hidden');
+            statusEl.innerText = "Study Session Active";
+            speak("Cards loaded successfully. Press Space to hear the first question.");
+        }
 
-    // RESET SESSION STATE
-    currentIndex = 0;
-    score = { correct: 0, incorrect: 0 };
-    state = "START";
+        async function loadSample() {
+            try {
+                const response = await fetch('flashcards.json');
+                const data = await response.json();
+                initApp(data);
+            } catch (err) {
+                alert("Could not load the sample file from GitHub.");
+            }
+        }
 
-    displayText.innerText = "Cards Loaded! Press Space to begin.";
-    document.getElementById('setup-ui').classList.add('hidden');
-    document.getElementById('app-ui').classList.remove('hidden');
-    statusEl.innerText = "Study Session Active";
-    speak("Cards loaded successfully. Press Space to hear the first question.");
-}
+        function resetToSetup() {
+            document.getElementById('app-ui').classList.add('hidden');
+            document.getElementById('setup-ui').classList.remove('hidden');
+            statusEl.innerText = "System Ready. Choose a way to start.";
+            speak("Welcome back. Please select your cards again.");
+        }
 
-async function loadSample() {
-    try {
-        const response = await fetch('flashcards.json');
-        const data = await response.json();
-        initApp(data);
-    } catch (err) {
-        alert("Could not load the sample file from GitHub.");
-    }
-}
-
-// Improved file input handler
-document.getElementById('file-input').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    try {
-        const text = await file.text();
-        const jsonData = JSON.parse(text);
-        initApp(jsonData);
-        // Clear the input so the same file can be uploaded again if needed
-        e.target.value = ""; 
-    } catch (err) {
-        alert("Error: This file is not a valid JSON file. Please check the formatting.");
-        console.error("Upload error:", err);
-    }
-});
-
+        document.getElementById('file-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
+                const text = await file.text();
+                initApp(JSON.parse(text));
+                e.target.value = ""; 
+            } catch (err) {
+                alert("Error: This file is not a valid JSON file.");
+            }
+        });
 
         function handleInput(key) {
             key = key.toLowerCase();
@@ -196,10 +190,6 @@ document.getElementById('file-input').addEventListener('change', async (e) => {
                 speak("Welcome. Choose a way to start. Press the Blue button to test the app with sample cards, or the Green button to upload your own flashcards file.");
             }, 500);
         };
-    </script>
-</body>
-</html>
-     };
     </script>
 </body>
 </html>
