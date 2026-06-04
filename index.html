@@ -19,8 +19,7 @@
         button { padding: 18px; font-size: 1.1em; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; color: white; transition: background 0.2s, transform 0.1s; }
         button:active { transform: scale(0.98); }
         
-        .btn-upload { background: #2ea44f; margin-bottom: 10px; display: inline-block; padding: 15px 30px; }
-        .btn-sample { background: #0366d6; margin-bottom: 10px; display: inline-block; padding: 15px 30px; }
+        .btn-test { background: #2ea44f; display: inline-block; padding: 20px 40px; font-size: 1.3em; }
         
         .btn-main { background: #0366d6; grid-column: span 2; }
         .btn-correct { background: #2ea44f; }
@@ -35,21 +34,12 @@
 <body>
     <div class="container">
         <h1>Accessible Flashcards Web</h1>
-        <p class="subtitle">A fully accessible, audio-first study tool for the visually impaired.</p>
+        <p class="subtitle">A fully accessible study tool for the visually impaired.</p>
         
-        <div id="status">System Ready. Please load cards to begin.</div>
+        <div id="status">System Ready.</div>
 
         <div id="setup-ui" class="setup-box">
-            <h3>Step 1: Load Your Cards</h3>
-            
-            <!-- Method A: Load Sample -->
-            <button class="btn-sample" onclick="loadSample()">📂 Load Sample SAT Math Cards</button>
-            <p>OR</p>
-            <!-- Method B: Upload JSON -->
-            <label class="btn-upload">
-                📂 Upload Your Own flashcards.json
-                <input type="file" id="file-input" accept=".json" style="display:none">
-            </label>
+            <button class="btn-test" onclick="loadSample()">🚀 Test App (Start Studying)</button>
         </div>
 
         <div id="app-ui" class="hidden">
@@ -67,9 +57,9 @@
             <h3>Quick Start Guide</h3>
             <ul>
                 <li><strong>Spacebar:</strong> Press once to hear the question, press again to hear the answer.</li>
-                <li><strong>'Y' / 'N':</strong> After hearing the answer, press Y if you were right or N if you were wrong.</li>
-                <li><strong>'R':</strong> Press to repeat the current question or answer.</li>
-                <li><strong>'Q':</strong> Press to finish your session and hear your total score.</li>
+                <li><strong>'Y' / 'N':</strong> Mark your answer as Correct or Incorrect.</li>
+                <li><strong>'R':</strong> Repeat the current audio.</li>
+                <li><strong>'Q':</strong> Finish and hear your total score.</li>
             </ul>
             <p><small><a href="https://github.com/salorajan/accessible-flashcards">GitHub Repository</a> | <a href="FLASHCARD_MANUAL.md">Full Manual</a></small></p>
         </div>
@@ -91,38 +81,21 @@
             synth.speak(utterance);
         }
 
-        // --- Loading Logic ---
-        function initApp(data) {
-            cards = data;
-            cards.sort(() => Math.random() - 0.5);
-            document.getElementById('setup-ui').classList.add('hidden');
-            document.getElementById('app-ui').classList.remove('hidden');
-            statusEl.innerText = "Study Session Active";
-            speak("Cards loaded successfully. Press Space to hear the first question.");
-        }
-
         async function loadSample() {
             try {
                 const response = await fetch('flashcards.json');
                 const data = await response.json();
-                initApp(data);
+                cards = data;
+                cards.sort(() => Math.random() - 0.5);
+                document.getElementById('setup-ui').classList.add('hidden');
+                document.getElementById('app-ui').classList.remove('hidden');
+                statusEl.innerText = "Study Session Active";
+                speak("Cards loaded successfully. Press Space to hear the first question.");
             } catch (err) {
-                alert("Could not load sample file. Please upload a JSON file manually.");
+                alert("Could not load the flashcards file.");
             }
         }
 
-        document.getElementById('file-input').onchange = async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            try {
-                const text = await file.text();
-                initApp(JSON.parse(text));
-            } catch (err) {
-                alert("Error: Invalid JSON file.");
-            }
-        };
-
-        // --- Interaction Logic ---
         function handleInput(key) {
             key = key.toLowerCase();
             if (state === "START") {
@@ -174,10 +147,9 @@
             }
         };
 
-        // Initial welcome
         window.onload = () => {
             setTimeout(() => {
-                speak("Welcome to Accessible Flashcards. Please click the button to load the sample cards, or upload your own flashcards dot J S O N file.");
+                speak("Welcome. Please click the Test App button to start your study session.");
             }, 500);
         };
     </script>
