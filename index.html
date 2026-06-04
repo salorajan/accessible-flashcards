@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accessible Flashcards Web</title>
+    <!-- Use a reliable CDN for Pyodite -->
     <script src="https://cdn.jsdelivr.net/pyodite/v0.26.1/full/pyodite.js"></script>
     <style>
         body { 
@@ -68,7 +69,7 @@
             margin: 20px 0;
         }
         #file-input { display: none; }
-        #status { color: #6a737d; margin: 10px 0; font-size: 0.9em; }
+        #status { color: #6a737d; margin: 10px 0; font-size: 1em; font-weight: bold; }
         
         .info-section {
             text-align: left;
@@ -87,6 +88,7 @@
             margin: 15px 0;
         }
         .hidden { display: none; }
+        .error-msg { color: #d73a49; background: #ffeef0; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #f97583; }
     </style>
 </head>
 <body>
@@ -95,7 +97,7 @@
         <p>A zero-install tool for independent study, designed for blind and visually impaired users.</p>
 
         <!-- Loader Status -->
-        <div id="status">Loading Python... Please wait.</div>
+        <div id="status">Loading Python Environment...</div>
 
         <!-- File Upload -->
         <label id="file-input-label" for="file-input" class="hidden">📂 Step 1: Upload flashcards.json</label>
@@ -149,7 +151,6 @@
         const appUi = document.getElementById('app-ui');
         const displayText = document.getElementById('display-text');
 
-        // --- Accessibility Speech Logic ---
         function speak(text) {
             synth.cancel();
             let utterance = new SpeechSynthesisUtterance(text);
@@ -157,21 +158,36 @@
             synth.speak(utterance);
         }
 
-        // --- Initialize Pyodite ---
         async function initPyodite() {
+            // Check if the script loaded at all
+            if (typeof loadPyodite === 'undefined') {
+                statusEl.innerHTML = `
+                    <div class="error-msg">
+                        <strong>Security Error:</strong> Python could not be loaded locally.<br><br>
+                        Browsers block this feature when opening files directly from your computer.<br><br>
+                        <strong>How to fix:</strong><br>
+                        1. Open PowerShell in this folder.<br>
+                        2. Run: <code>python -m http.server 8000</code><br>
+                        3. Go to: <code>http://localhost:8000</code> in your browser.
+                    </div>
+                `;
+                return;
+            }
+
             try {
-                // Auto-detect indexURL for better reliability
+                statusEl.innerText = "Initializing Python... (this may take 10 seconds)";
                 pyodite = await loadPyodite();
                 statusEl.innerText = "Python Ready. Please upload your JSON file.";
                 uploadLabel.classList.remove('hidden');
             } catch (err) {
-                statusEl.innerText = "Error loading Python: " + err.message;
+                statusEl.innerHTML = `<div class="error-msg">Failed to initialize Python: ${err.message}</div>`;
                 console.error("Pyodite Load Error:", err);
             }
         }
-        initPyodite();
 
-        // --- File Handling ---
+        // Wait for everything to load before starting
+        window.onload = initPyodite;
+
         document.getElementById('file-input').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file || !pyodite) return;
@@ -180,7 +196,6 @@
             const jsonText = await file.text();
             
             try {
-                // Set the JSON data safely into Python global scope
                 pyodite.globals.set("json_data", jsonText);
                 
                 await pyodite.runPythonAsync(`
@@ -249,7 +264,6 @@
             }
         });
 
-        // --- Interaction ---
         async function handleInput(key) {
             if (!pyodite) return;
             try {
