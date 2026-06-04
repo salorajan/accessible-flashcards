@@ -8,7 +8,7 @@
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; 
             line-height: 1.6; 
-            max-width: 800px; 
+            max-width: 900px; 
             margin: 40px auto; 
             padding: 20px; 
             background-color: #f6f8fa;
@@ -18,56 +18,92 @@
             background: white;
             padding: 40px;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         h1 { color: #0366d6; border-bottom: 2px solid #eaecef; padding-bottom: 10px; }
+        h2 { color: #24292e; margin-top: 30px; }
         .download-section { 
             background: #e1f5fe; 
-            padding: 20px; 
-            border-radius: 6px; 
+            padding: 25px; 
+            border-radius: 8px; 
             border: 1px solid #b3e5fc;
-            margin: 20px 0;
+            margin: 25px 0;
+            text-align: center;
         }
         .btn { 
             display: inline-block; 
             background: #2ea44f; 
             color: white; 
-            padding: 12px 24px; 
+            padding: 14px 28px; 
             text-decoration: none; 
             border-radius: 6px; 
             font-weight: bold;
+            font-size: 1.1em;
         }
         .btn:hover { background: #2c974b; }
-        code { background: #f3f3f3; padding: 2px 5px; border-radius: 3px; }
-        ul { padding-left: 20px; }
+        code { background: #f3f3f3; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        .shortcut-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .shortcut-item {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        .prompt-box {
+            background: #24292e;
+            color: #e6edf3;
+            padding: 20px;
+            border-radius: 6px;
+            position: relative;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Accessible Flashcards for the Blind</h1>
-        <p>A keyboard-driven, offline-first flashcard application designed specifically for visually impaired users. Built with Python and <code>pyttsx3</code>.</p>
+        <p>This application is designed specifically for blind and visually impaired users. It provides a keyboard-only experience with full Text-to-Speech (TTS) support, ensuring that studying remains independent and accessible.</p>
         
         <div class="download-section">
-            <h2>Download</h2>
-            <p>Download the latest Windows executable and the sample SAT Math cards:</p>
+            <h2>Download & Install</h2>
+            <p>Download the Windows application and the sample card set below:</p>
             <a href="dist/app.exe" class="btn">Download app.exe (Windows)</a>
-            <p><small>Note: Also download <strong><a href="flashcards.json">flashcards.json</a></strong> and keep it in the same folder as the exe.</small></p>
+            <p style="margin-top: 15px;">
+                <small>Required: Download <strong><a href="flashcards.json">flashcards.json</a></strong> and place it in the same folder as the exe.</small>
+            </p>
         </div>
         
-        <h2>How to Use</h2>
-        <p>The app is 100% accessible via keyboard. No mouse required!</p>
+        <h2>How to Use (Keyboard Shortcuts)</h2>
+        <div class="shortcut-grid">
+            <div class="shortcut-item"><strong>Spacebar:</strong> Hear Question / Hear Answer</div>
+            <div class="shortcut-item"><strong>Y Key:</strong> Mark as Correct</div>
+            <div class="shortcut-item"><strong>N Key:</strong> Mark as Incorrect</div>
+            <div class="shortcut-item"><strong>R Key:</strong> Repeat Audio</div>
+            <div class="shortcut-item"><strong>Q Key:</strong> Quit & View Score</div>
+        </div>
+
+        <h2>Create Your Own Topics</h2>
+        <p>Edit the <code>flashcards.json</code> file with any text editor. Use the AI prompt below to generate new content instantly:</p>
+        
+        <div class="prompt-box">"Act as an educational content creator. I need a flashcard set in JSON format for the topic: [INSERT TOPIC]. Please provide exactly 10 cards. The format MUST be a list of objects where each object has a 'question' and an 'answer' key. IMPORTANT: Write all math and complex terms exactly how they should be SPOKEN (e.g., use 'squared' instead of '^2'). Return ONLY the raw JSON code block."</div>
+
+        <h2>Installation Note (SmartScreen)</h2>
+        <p>If Windows displays a "Protected your PC" warning:</p>
         <ul>
-            <li><strong>Spacebar:</strong> Hear the Question / Hear the Answer.</li>
-            <li><strong>Y Key:</strong> Mark as Correct.</li>
-            <li><strong>N Key:</strong> Mark as Incorrect.</li>
-            <li><strong>R Key:</strong> Repeat the current audio.</li>
-            <li><strong>Q Key:</strong> Quit and hear your score.</li>
+            <li>Click <strong>"More info"</strong></li>
+            <li>Click <strong>"Run anyway"</strong></li>
         </ul>
-        
-        <h2>For Families: Create Your Own Cards</h2>
-        <p>You can create custom study sets for any topic using a simple JSON format. See the <a href="FLASHCARD_MANUAL.md">Full Manual</a> for instructions and an AI prompt to help you generate content.</p>
-        
-        <p style="margin-top: 40px; color: #6a737d; font-size: 0.8em;">Project by salorajan</p>
+
+        <p style="margin-top: 50px; border-top: 1px solid #eaecef; padding-top: 20px; color: #6a737d;">
+            <a href="FLASHCARD_MANUAL.md">View Full Manual (Markdown)</a> | 
+            <a href="https://github.com/salorajan/accessible-flashcards">Project GitHub Repository</a>
+        </p>
     </div>
 </body>
 </html>
