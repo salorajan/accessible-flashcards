@@ -60,11 +60,15 @@ Since this is a custom tool, Windows may block it initially.
 
 ---
 
-## 5. Website Elements (For Sighted Helpers)
-The landing page at [salorajan.github.io/accessible-flashcards/](https://salorajan.github.io/accessible-flashcards/) contains:
-*   **Header**: "Accessible Flashcards for the Blind".
-*   **Description**: Overview of the app's goals and technology.
-*   **Download Section**: A green button to download `app.exe` and a link to `flashcards.json`.
-*   **Keyboard Guide**: A list of the shortcuts (`Space`, `Y`, `N`, `R`, `Q`).
-*   **Family Guide**: Brief instructions on how to customize cards.
-*   **Manual Link**: A link to this full manual.
+## 6. Local Testing (For Web App)
+If you try to open `index.html` by double-clicking it, your browser might block Python from loading for security reasons (this is called a "CORS" error).
+
+**To test the web app on your own computer:**
+1.  Open a terminal (PowerShell or CMD) in your project folder.
+2.  Run this command:
+    ```bash
+    python -m http.server 8000
+    ```
+3.  Open your browser and go to: `http://localhost:8000`
+
+This creates a "local server" which bypasses the browser's security restrictions.

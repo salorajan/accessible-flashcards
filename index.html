@@ -160,11 +160,14 @@
         // --- Initialize Pyodite ---
         async function initPyodite() {
             try {
-                pyodite = await loadPyodite();
+                // Explicitly set the indexURL to the CDN for better compatibility
+                pyodite = await loadPyodite({
+                    indexURL: "https://cdn.jsdelivr.net/pyodite/v0.25.0/full/"
+                });
                 statusEl.innerText = "Python Ready. Please upload your JSON file.";
                 uploadLabel.classList.remove('hidden');
             } catch (err) {
-                statusEl.innerText = "Error loading Python. Please refresh.";
+                statusEl.innerText = "Error loading Python. Please use a local server (see Manual).";
                 console.error(err);
             }
         }
